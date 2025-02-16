@@ -1,4 +1,5 @@
 <Talotekniiikka TTMI23KM>
+<!DOCTYPE html>
 <html lang="fi">
 <head>
   <meta charset="UTF-8">
@@ -21,11 +22,6 @@
     }
     .question {
       font-size: 1.2em;
-      margin-bottom: 10px;
-    }
-    .instruction {
-      font-size: 0.9em;
-      color: #555;
       margin-bottom: 10px;
     }
     .options button {
@@ -70,7 +66,6 @@
   <div class="container">
     <div id="quiz">
       <div class="question" id="questionText">Kysymys tulee tähän...</div>
-      <div class="instruction" id="instructionText"></div>
       <div class="options" id="optionsContainer">
         <!-- Vastausvaihtoehdot lisätään JavaScriptillä -->
       </div>
@@ -80,274 +75,465 @@
   </div>
 
   <script>
-    // Apufunktio vastausvaihtoehtojen sekoittamiseen (Fisher-Yates)
-    function shuffleArray(array) {
-      const arr = array.slice();
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
-
-    /* 
-      QuizData-esimerkit:
-      - direction: "fiToSv" => Kysymys suomeksi, vastausvaihtoehdot ruotsiksi.
-      - direction: "svToFi" => Kysymys ruotsiksi, vastausvaihtoehdot suomeksi.
-      - questionFi ja questionSv sisältävät kysymyksen molemmilla kielillä.
-      - options sisältää kaikki vastausvaihtoehdot (kieliversio riippuu kysymyksen suunnasta).
-      - correctAnswer on oikea vastaus (kirjoitettu samanlaisena kuin options-arvossa).
-    */
+    // Kysymysten data – 40 kysymystä, joissa 20 liittyy opintoihin ja 20 ammatti- ja sanastoteemoihin.
     const quizData = [
       // Opintoihin ja opiskeluun liittyvät kysymykset (1-20)
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsinkielinen vastine sanalle 'etäopetus'?",
-        questionSv: "",
-        options: ["studera på distans", "en distansstuderande", "distansstudier", "opiskella etänä"],
-        correctAnswer: "distansstudier"
+        question: "Mikä on ruotsinkielinen vastine sanalle 'etäopetus'?",
+        options: [
+          "studera på distans",
+          "en distansstuderande",
+          "distansstudier",
+          "opiskella etänä"
+        ],
+        correctIndex: 2
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsinkielinen vastine sanalle 'etäopiskelija'?",
-        questionSv: "",
-        options: ["studera på distans", "en distansstuderande", "distansstudier", "opiskella etänä"],
-        correctAnswer: "en distansstuderande"
+        question: "Mikä on ruotsinkielinen vastine sanalle 'etäopiskelija'?",
+        options: [
+          "studera på distans",
+          "en distansstuderande",
+          "distansstudier",
+          "opiskella etänä"
+        ],
+        correctIndex: 1
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsinkielinen termi 'opiskella etänä'?",
-        questionSv: "",
-        options: ["studera på distans", "en distansstuderande", "distansstudier", "et studera på nätet"],
-        correctAnswer: "studera på distans"
+        question: "Mikä on ruotsinkielinen termi 'opiskella etänä'?",
+        options: [
+          "studera på distans",
+          "en distansstuderande",
+          "distansstudier",
+          "et studera på nätet"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Onko väittämä totta? 'En distansstuderande opiskelee etänä.'",
-        questionSv: "",
-        options: ["Oikein", "Väärin"],
-        correctAnswer: "Oikein"
+        question: "Onko väittämä totta? 'En distansstuderande opiskelee etänä.'",
+        options: [
+          "Oikein",
+          "Väärin"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'yrkeshögskola' suomeksi?",
-        questionSv: "",
-        options: ["ammattikorkeakoulu", "tutkinto", "opintopiste", "koulutus"],
-        correctAnswer: "ammattikorkeakoulu"
+        question: "Mikä on ruotsin termi 'yrkeshögskola' suomeksi?",
+        options: [
+          "ammattikorkeakoulu",
+          "tutkinto",
+          "opintopiste",
+          "koulutus"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin sana 'examen' suomeksi?",
-        questionSv: "",
-        options: ["tutkinto", "ammattilainen", "koulutus", "opiskelija"],
-        correctAnswer: "tutkinto"
+        question: "Mikä on ruotsin sana 'examen' suomeksi?",
+        options: [
+          "tutkinto",
+          "ammattilainen",
+          "koulutus",
+          "opiskelija"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'Yrkeshögskoleexamen' suomeksi?",
-        questionSv: "",
-        options: ["ammattiluottamus", "ammattikorkeakoulututkinto", "opintotodistus", "opintopiste"],
-        correctAnswer: "ammattikorkeakoulututkinto"
+        question: "Mikä on ruotsin termi 'Yrkeshögskoleexamen' suomeksi?",
+        options: [
+          "ammattiluottamus",
+          "ammattikorkeakoulututkinto",
+          "opintotodistus",
+          "opintopiste"
+        ],
+        correctIndex: 1
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin ilmaisu 'ger dig färdigheter för' suomeksi?",
-        questionSv: "",
-        options: ["antaa sinulle taitoja", "kehittää taitoja", "suorittaa opinnot", "tutkinto"],
-        correctAnswer: "antaa sinulle taitoja"
+        question: "Mikä on ruotsin ilmaisu 'ger dig färdigheter för' suomeksi?",
+        options: [
+          "antaa sinulle taitoja",
+          "kehittää taitoja",
+          "suorittaa opinnot",
+          "tutkinto"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'Grundstudierna' suomeksi?",
-        questionSv: "",
-        options: ["perusopinnot", "ammattiopinnot", "valinnaiset opinnot", "vapaasti valittavat opinnot"],
-        correctAnswer: "perusopinnot"
+        question: "Mikä on ruotsin termi 'Grundstudierna' suomeksi?",
+        options: [
+          "perusopinnot",
+          "ammattiopinnot",
+          "valinnaiset opinnot",
+          "vapaasti valittavat opinnot"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'Yrkesstudierna' suomeksi?",
-        questionSv: "",
-        options: ["ammattiopinnot", "perusopinnot", "valinnaiset opinnot", "vapaasti valittavat opinnot"],
-        correctAnswer: "ammattiopinnot"
+        question: "Mikä on ruotsin termi 'Yrkesstudierna' suomeksi?",
+        options: [
+          "ammattiopinnot",
+          "perusopinnot",
+          "valinnaiset opinnot",
+          "vapaasti valittavat opinnot"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'valfria studier' suomeksi?",
-        questionSv: "",
-        options: ["valinnaiset opinnot", "ammattiopinnot", "perusopinnot", "opintopisteet"],
-        correctAnswer: "valinnaiset opinnot"
+        question: "Mikä on ruotsin termi 'valfria studier' suomeksi?",
+        options: [
+          "valinnaiset opinnot",
+          "ammattiopinnot",
+          "perusopinnot",
+          "opintopisteet"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'fritt valbara studier' suomeksi?",
-        questionSv: "",
-        options: ["vapaasti valittavat opinnot", "valinnaiset opinnot", "ammattiopinnot", "perusopinnot"],
-        correctAnswer: "vapaasti valittavat opinnot"
+        question: "Mikä on ruotsin termi 'fritt valbara studier' suomeksi?",
+        options: [
+          "vapaasti valittavat opinnot",
+          "valinnaiset opinnot",
+          "ammattiopinnot",
+          "perusopinnot"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'språk- och kommunikationsstudier' suomeksi?",
-        questionSv: "",
-        options: ["kieli- ja viestintäopinnot", "ammattiopinnot", "perusopinnot", "tutkinto"],
-        correctAnswer: "kieli- ja viestintäopinnot"
+        question: "Mikä on ruotsin termi 'språk- och kommunikationsstudier' suomeksi?",
+        options: [
+          "kieli- ja viestintäopinnot",
+          "ammattiopinnot",
+          "perusopinnot",
+          "tutkinto"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'studiepoäng' suomeksi?",
-        questionSv: "",
-        options: ["opintopiste", "laajuus", "tutkinto", "opiskelija"],
-        correctAnswer: "opintopiste"
+        question: "Mikä on ruotsin termi 'studiepoäng' suomeksi?",
+        options: [
+          "opintopiste",
+          "laajuus",
+          "tutkinto",
+          "opiskelija"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'studerande' suomeksi?",
-        questionSv: "",
-        options: ["opiskelija", "tutkinto", "koulutus", "opiskelijavaihto"],
-        correctAnswer: "opiskelija"
+        question: "Mikä on ruotsin termi 'studerande' suomeksi?",
+        options: [
+          "opiskelija",
+          "tutkinto",
+          "koulutus",
+          "opiskelijavaihto"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'utbildning' suomeksi?",
-        questionSv: "",
-        options: ["koulutus", "examens", "studier", "opintopiste"],
-        correctAnswer: "koulutus"
+        question: "Mikä on ruotsin termi 'utbildning' suomeksi?",
+        options: [
+          "koulutus",
+          "examens",
+          "studier",
+          "opintopiste"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'ackreditering' suomeksi?",
-        questionSv: "",
-        options: ["hyväksilukeminen", "avlägga en examen", "certifiering", "godkännande"],
-        correctAnswer: "hyväksilukeminen"
+        question: "Mikä on ruotsin termi 'ackreditering' suomeksi?",
+        options: [
+          "hyväksilukeminen",
+          "avlägga en examen",
+          "certifiering",
+          "godkännande"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'fortsatta studier' suomeksi?",
-        questionSv: "",
-        options: ["jatko-opinnot", "perusopinnot", "ammattiopinnot", "opintojen loppu"],
-        correctAnswer: "jatko-opinnot"
+        question: "Mikä on ruotsin termi 'fortsatta studier' suomeksi?",
+        options: [
+          "jatko-opinnot",
+          "perusopinnot",
+          "ammattiopinnot",
+          "opintojen loppu"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "fiToSv",
-        questionFi: "Mikä on ruotsin termi 'utbytesstudier' suomeksi?",
-        questionSv: "",
-        options: ["vaihto-opiskelu", "etäopinnot", "harjoittelu", "perusopinnot"],
-        correctAnswer: "vaihto-opiskelu"
+        question: "Mikä on ruotsin termi 'utbytesstudier' suomeksi?",
+        options: [
+          "vaihto-opiskelu",
+          "etäopinnot",
+          "harjoittelu",
+          "perusopinnot"
+        ],
+        correctIndex: 0
       },
       // Ammatti- ja sanastoteemoihin liittyvät kysymykset (21-40)
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'expert' på finska?",
-        options: ["asiantuntija", "opiskelija", "tutkinto", "suunnittelu"],
-        correctAnswer: "asiantuntija"
+        question: "Mikä on ruotsin sana 'expert' suomeksi?",
+        options: [
+          "asiantuntija",
+          "opiskelija",
+          "tutkinto",
+          "suunnittelu"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'expertuppdrag' på finska?",
-        options: ["asiantuntijatehtävät", "tutkinnon suoritus", "opinnot", "koulutus"],
-        correctAnswer: "asiantuntijatehtävät"
+        question: "Mikä on ruotsin sana 'expertuppdrag' suomeksi?",
+        options: [
+          "asiantuntijatehtävät",
+          "tutkinnon suoritus",
+          "opinnot",
+          "koulutus"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'planerings' på finska?",
-        options: ["suunnittelu", "kehittäminen", "opintopiste", "koulutus"],
-        correctAnswer: "suunnittelu"
+        question: "Mikä on ruotsin sana 'planerings' suomeksi?",
+        options: [
+          "suunnittelu",
+          "kehittäminen",
+          "opintopiste",
+          "koulutus"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'utvecklings' på finska?",
-        options: ["kehittäminen", "suunnittelu", "harjoittelu", "koulutus"],
-        correctAnswer: "kehittäminen"
+        question: "Mikä on ruotsin sana 'utvecklings' suomeksi?",
+        options: [
+          "kehittäminen",
+          "suunnittelu",
+          "harjoittelu",
+          "koulutus"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'tekniska tjänster' på finska?",
-        options: ["tekniset palvelut", "koulutus", "opiskelutavat", "suunnittelu"],
-        correctAnswer: "tekniset palvelut"
+        question: "Mikä on ruotsin termi 'tekniska tjänster' suomeksi?",
+        options: [
+          "tekniset palvelut",
+          "koulutus",
+          "opiskelutavat",
+          "suunnittelu"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'system' på finska?",
-        options: ["järjestelmä", "opintopiste", "tutkinto", "asiantuntija"],
-        correctAnswer: "järjestelmä"
+        question: "Mikä on ruotsin sana 'system' suomeksi?",
+        options: [
+          "järjestelmä",
+          "opintopiste",
+          "tutkinto",
+          "asiantuntija"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'apparat' på finska?",
-        options: ["laite", "järjestelmä", "koulutus", "opinnot"],
-        correctAnswer: "laite"
+        question: "Mikä on ruotsin sana 'apparat' suomeksi?",
+        options: [
+          "laite",
+          "järjestelmä",
+          "koulutus",
+          "opinnot"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'fastighet' på finska?",
-        options: ["kiinteistö", "asunto", "tutkinto", "opiskelija"],
-        correctAnswer: "kiinteistö"
+        question: "Mikä on ruotsin termi 'fastighet' suomeksi?",
+        options: [
+          "kiinteistö",
+          "asunto",
+          "tutkinto",
+          "opiskelija"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'lokal' på finska?",
-        options: ["tila", "järjestelmä", "koulutus", "opiskelija"],
-        correctAnswer: "tila"
+        question: "Mikä on ruotsin termi 'lokal' suomeksi?",
+        options: [
+          "tila",
+          "järjestelmä",
+          "koulutus",
+          "opiskelija"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'VVS-planerare' på finska?",
-        options: ["LVI-suunnittelija", "LVI-asentaja", "LVI-inspektööri", "LVI-tarkastusinsinööri"],
-        correctAnswer: "LVI-suunnittelija"
+        question: "Mikä on ruotsin termi 'VVS-planerare' suomeksi?",
+        options: [
+          "LVI-suunnittelija",
+          "LVI-asentaja",
+          "LVI-inspektööri",
+          "LVI-tarkastusinsinööri"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'VVS-montör' på finska?",
-        options: ["LVI-asentaja", "LVI-suunnittelija", "LVI-inspektööri", "LVI-tarkastusinsinööri"],
-        correctAnswer: "LVI-asentaja"
+        question: "Mikä on ruotsin termi 'VVS-montör' suomeksi?",
+        options: [
+          "LVI-asentaja",
+          "LVI-suunnittelija",
+          "LVI-inspektööri",
+          "LVI-tarkastusinsinööri"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'försäljningsingenjör' på finska?",
-        options: ["myynti-insinööri", "opiskelija", "asiantuntija", "suunnittelija"],
-        correctAnswer: "myynti-insinööri"
+        question: "Mikä on ruotsin sana 'försäljningsingenjör' suomeksi?",
+        options: [
+          "myynti-insinööri",
+          "opiskelija",
+          "asiantuntija",
+          "suunnittelija"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'konsult' på finska?",
-        options: ["konsultti", "opiskelija", "tutkinto", "suunnittelu"],
-        correctAnswer: "konsultti"
+        question: "Mikä on ruotsin sana 'konsult' suomeksi?",
+        options: [
+          "konsultti",
+          "opiskelija",
+          "tutkinto",
+          "suunnittelu"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'underhållsingenjör' på finska?",
-        options: ["ylläpitoinsinööri", "LVI-asentaja", "konsultti", "suunnittelija"],
-        correctAnswer: "ylläpitoinsinööri"
+        question: "Mikä on ruotsin termi 'underhållsingenjör' suomeksi?",
+        options: [
+          "ylläpitoinsinööri",
+          "LVI-asentaja",
+          "konsultti",
+          "suunnittelija"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'energianpassad' på finska?",
-        options: ["energiatehokas", "ympäristöystävällinen", "kestävä", "suunniteltu"],
-        correctAnswer: "energiatehokas"
+        question: "Mikä on ruotsin termi 'energianpassad' suomeksi?",
+        options: [
+          "energiatehokas",
+          "ympäristöystävällinen",
+          "kestävä",
+          "suunniteltu"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'lösning' på finska?",
-        options: ["ratkaisu", "järjestelmä", "opinnot", "koulutus"],
-        correctAnswer: "ratkaisu"
+        question: "Mikä on ruotsin termi 'lösning' suomeksi?",
+        options: [
+          "ratkaisu",
+          "järjestelmä",
+          "opinnot",
+          "koulutus"
+        ],
+        correctIndex: 0
       },
       {
-        direction: "svToFi",
-        questionFi: "",
-        questionSv: "Vad betyder 'myndighet' på finska?",
-       
+        question: "Mikä on ruotsin termi 'myndighet' suomeksi?",
+        options: [
+          "viranomainen",
+          "opiskelija",
+          "työnantaja",
+          "koulutus"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Mikä on ruotsin termi 'placera' suomeksi?",
+        options: [
+          "sijoittua",
+          "opiskella",
+          "suorittaa",
+          "kehittää"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Mikä on ruotsin termi 'ingenjörs- och planeringsbyrå' suomeksi?",
+        options: [
+          "insinööri- ja suunnittelutoimisto",
+          "koulutusinstituutio",
+          "työpaikka",
+          "opintokeskus"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Mikä on ruotsin termi 'produktindustri' suomeksi?",
+        options: [
+          "tuoteteollisuus",
+          "koulutus",
+          "opiskelija",
+          "tutkinto"
+        ],
+        correctIndex: 0
+      },
+      {
+        question: "Mikä on ruotsin termi 'offentliga sektorn' suomeksi?",
+        options: [
+          "julkinen sektori",
+          "yksityinen sektori",
+          "opetus",
+          "koulutus"
+        ],
+        correctIndex: 0
+      }
+    ];
+
+    let currentQuestionIndex = 0;
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const feedback = document.getElementById("feedback");
+    const nextButton = document.getElementById("nextButton");
+
+    // Lataa kysymys
+    function loadQuestion() {
+      feedback.textContent = "";
+      nextButton.style.display = "none";
+      optionsContainer.innerHTML = "";
+
+      const currentQuestion = quizData[currentQuestionIndex];
+      questionText.textContent = currentQuestion.question;
+
+      currentQuestion.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.textContent = option;
+        button.addEventListener("click", () => selectOption(index, button));
+        optionsContainer.appendChild(button);
+      });
+    }
+
+    // Käsittele vastausnapin klikkaus
+    function selectOption(selectedIndex, buttonElement) {
+      const buttons = optionsContainer.querySelectorAll("button");
+      buttons.forEach(btn => btn.disabled = true);
+
+      const currentQuestion = quizData[currentQuestionIndex];
+      if(selectedIndex === currentQuestion.correctIndex) {
+        buttonElement.classList.add("correct");
+        feedback.textContent = "Oikein!";
+      } else {
+        buttonElement.classList.add("incorrect");
+        feedback.textContent = "Väärin!";
+        if(buttons[currentQuestion.correctIndex]) {
+          buttons[currentQuestion.correctIndex].classList.add("correct");
+        }
+      }
+      nextButton.style.display = "block";
+    }
+
+    nextButton.addEventListener("click", () => {
+      currentQuestionIndex++;
+      if(currentQuestionIndex < quizData.length) {
+        loadQuestion();
+      } else {
+        questionText.textContent = "Testi suoritettu!";
+        optionsContainer.innerHTML = "";
+        feedback.textContent = "";
+        nextButton.style.display = "none";
+      }
+    });
+
+    loadQuestion();
+  </script>
+</body>
+</html>
