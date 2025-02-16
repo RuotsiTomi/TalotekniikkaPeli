@@ -1,4 +1,4 @@
-<Talotekniiikka TTMI23KM>
+<TTMI23KM>
 <html lang="fi">
 <head>
   <meta charset="UTF-8">
@@ -78,23 +78,22 @@
 <body>
   <div class="container">
     <div id="quiz">
-      <!-- Käännössuunta-info näkyy monivalintatehtävissä -->
+      <!-- Näytetään käännössuunta esim. "Käännä suomesta ruotsiksi:" -->
       <div class="direction" id="directionInfo"></div>
       <div class="question" id="questionText">Kysymys tulee tähän...</div>
       <div id="taskArea">
-        <!-- Tässä alueessa joko monivalintavaihtoehdot tai lauseen muodostus -elementit näytetään -->
+        <!-- Tähän lisätään joko monivalintavaihtoehdot tai lauseen muodostus -elementit -->
       </div>
       <div id="feedback"></div>
-      <!-- Painikkeet: monivalintatehtävissä käytetään vain Seuraava kysymys -->
+      <!-- Näytetään napit tilanteen mukaan -->
       <button id="nextButton" style="display:none;">Seuraava kysymys</button>
-      <!-- Lauseen muodostustehtävien painikkeet -->
       <button id="submitSentence" style="display:none;">Lähetä vastaus</button>
       <button id="clearSentence" style="display:none;">Tyhjennä</button>
     </div>
   </div>
 
   <script>
-    // Apufunktio vastausvaihtoehtojen sekoittamiseen
+    // Apufunktio sekoittamaan taulukon alkiot
     function shuffle(array) {
       for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -103,66 +102,305 @@
       return array;
     }
 
-    // Quiz-datan rakenne sisältää kaksi tyyppiä:
-    // - type: "mc" (monivalinta) ja "sentence" (lauseen muodostus)
-    // - Kummassakin tapauksessa on kenttä question, direction (fi2sv tai sv2fi).
-    // Monivalintatehtävissä:
-    //   options: vaihtoehdot, correctAnswer: oikea vastaus (täsmälleen sama merkkijono).
-    // Lauseen muodostustehtävissä:
-    //   givenWords: taulukko annetuista sanoista (sekoitetaan), correctSentence: oikea lause.
+    /* Quiz-data
+       Ensimmäiset 20 kysymystä: Opintoihin liittyvät (10 monivalintaa, 10 lauseenmuodostusta)
+       Seuraavat 20 kysymystä: Työ- ja sanastoteemat (10 monivalintaa, 10 lauseenmuodostusta)
+       Kaikissa lauseenmuodostustehtävissä käännetään suomesta ruotsiksi (direction: "fi2sv").
+    */
     const quizData = [
-      // Monivalintatehtäviä (type: "mc")
+      // OPINTOAIHEISET KYSYMYKSET (1-20)
+      // Monivalinta (MC) - 10 kpl
       {
         type: "mc",
-        question: "Mikä on ruotsinkielinen vastine sanalle 'etäopetus'?",
-        options: ["studera på distans", "en distansstuderande", "distansstudier", "distance"],
-        correctAnswer: "distansstudier",
+        question: "Mikä on ruotsin termi 'ammattikorkeakoulu'?",
+        options: ["yrkeshögskola", "universitet", "högskola", "lärarutbildning"],
+        correctAnswer: "yrkeshögskola",
         direction: "fi2sv"
       },
       {
         type: "mc",
-        question: "Vad betyder 'en distansstuderande' på finska?",
-        options: ["etäopiskella", "etäopetus", "opiskella etänä", "etäopiskelija"],
-        correctAnswer: "etäopiskelija",
-        direction: "sv2fi"
-      },
-      // Lauseen muodostustehtävä (type: "sentence")
-      {
-        type: "sentence",
-        question: "Muodosta lause ruotsiksi käyttämällä annettuja sanoja:",
-        givenWords: ["studera", "Jag", "husteknik"],
-        correctSentence: "Jag studera husteknik",  // Esimerkin vastaus, muokkaa tarvittaessa (voit halutessasi käyttää oikea muotoa, esim. "Jag studerar husteknik")
+        question: "Mikä on ruotsin termi 'opintopiste'?",
+        options: ["studiepoäng", "kursenhet", "kredit", "utbildningspoäng"],
+        correctAnswer: "studiepoäng",
         direction: "fi2sv"
       },
-      // Toinen lauseen muodostustehtävä
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'perusopinnot'?",
+        options: ["grundstudier", "basstudier", "grundläggande studier", "förberedande studier"],
+        correctAnswer: "grundstudier",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'ammattiopinnot'?",
+        options: ["yrkesstudier", "teknikstudier", "yrkesutbildning", "yrkeskurser"],
+        correctAnswer: "yrkesstudier",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'valinnaiset opinnot'?",
+        options: ["valfria studier", "fria studier", "frivilliga studier", "alternativa studier"],
+        correctAnswer: "valfria studier",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'kieli- ja viestintäopinnot'?",
+        options: ["språk- och kommunikationsstudier", "språkundervisning", "kommunikationskurser", "språkstudier"],
+        correctAnswer: "språk- och kommunikationsstudier",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'hyväksilukeminen'?",
+        options: ["ackreditering", "godkännande", "certifiering", "avlägga en examen"],
+        correctAnswer: "ackreditering",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'jatko-opinnot'?",
+        options: ["fortsatta studier", "vidareutbildning", "avancerade studier", "efterstudier"],
+        correctAnswer: "fortsatta studier",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'vaihto-opiskelu'?",
+        options: ["utbytesstudier", "studieresa", "utbyte", "studentutbyte"],
+        correctAnswer: "utbytesstudier",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'opiskelijavaihto'?",
+        options: ["studerandeutbyte", "studentutbyte", "utbytesstudier", "utbytestudent"],
+        correctAnswer: "studerandeutbyte",
+        direction: "fi2sv"
+      },
+      // Lauseen muodostustehtävät – suomesta ruotsiksi (10 kpl)
       {
         type: "sentence",
-        question: "Formera en mening på finska med orden:",
-        givenWords: ["opiskelen", "minä", "talotekniikkaa"],
-        correctSentence: "minä opiskelen talotekniikkaa",
-        direction: "sv2fi"
-      },
-      // Lisää muita monivalinta- tai lauseenmuodostustehtäviä tässä...
-      {
-        type: "mc",
-        question: "Mikä on ruotsin sana 'examen' suomeksi?",
-        options: ["tutkia", "ammattilainen", "koulutus", "tutkinto"],
-        correctAnswer: "tutkinto",
-        direction: "sv2fi"
+        question: "Muodosta ruotsiksi: 'Opiskelen talotekniikkaa Kaakkois-Suomen ammattikorkeakoulussa Mikkelin kampuksella.'",
+        givenWords: ["Jag", "studerar", "husteknik", "vid", "Sydöstra", "Finlands", "yrkeshögskola", "på", "Mikkelin", "campus"],
+        correctSentence: "Jag studerar husteknik vid Sydöstra Finlands yrkeshögskola på Mikkelin campus",
+        direction: "fi2sv"
       },
       {
-        type: "mc",
-        question: "Vad betyder 'Yrkeshögskoleexamen' på finska?",
-        options: ["ammattiluottamus", "ammattikorkeakoulututkinto", "opintotodistus", "opintopiste"],
-        correctAnswer: "ammattikorkeakoulututkinto",
-        direction: "sv2fi"
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Aloitin opintoni tammikuussa 2023 ja olen suorittanut 60 opintopistettä.'",
+        givenWords: ["Jag", "började", "mina", "studier", "i", "januari", "2023", "och", "har", "avlagt", "60", "studiepoäng"],
+        correctSentence: "Jag började mina studier i januari 2023 och har avlagt 60 studiepoäng",
+        direction: "fi2sv"
       },
-      // Voit lisätä vielä lisää tehtäviä, kunnes kokonaismäärä on haluttu (esim. 40 kysymystä)
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Valitsin insinööriopinnot, koska olen kiinnostunut teknologiasta ja kehityksestä.'",
+        givenWords: ["Jag", "valde", "ingenjörsstudier", "eftersom", "jag", "är", "intresserad", "av", "teknik", "och", "utveckling"],
+        correctSentence: "Jag valde ingenjörsstudier eftersom jag är intresserad av teknik och utveckling",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Olen opiskellut nyt kolme vuotta ja suorittanut 90 opintopistettä.'",
+        givenWords: ["Jag", "har", "studerat", "i", "tre", "år", "och", "har", "avlagt", "90", "studiepoäng"],
+        correctSentence: "Jag har studerat i tre år och har avlagt 90 studiepoäng",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Perusopinnot muodostavat koulutukseni perustan.'",
+        givenWords: ["Grundstudier", "utgör", "grunden", "för", "min", "utbildning"],
+        correctSentence: "Grundstudier utgör grunden för min utbildning",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Kieli- ja viestintäopinnot ovat tärkeitä tulevaisuuden työelämässä.'",
+        givenWords: ["Språk- och", "kommunikationsstudier", "är", "viktiga", "för", "framtidens", "arbetsliv"],
+        correctSentence: "Språk- och kommunikationsstudier är viktiga för framtidens arbetsliv",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Hyväksilukeminen mahdollistaa opintojen nopeamman etenemisen.'",
+        givenWords: ["Ackreditering", "möjliggör", "snabbare", "studieframsteg"],
+        correctSentence: "Ackreditering möjliggör snabbare studieframsteg",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Jatko-opinnot tarjoavat syvempää osaamista alalla.'",
+        givenWords: ["Fortsatta", "studier", "erbjuder", "djupare", "kompetens", "inom", "området"],
+        correctSentence: "Fortsatta studier erbjuder djupare kompetens inom området",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Opiskelijavaihto rikastuttaa kulttuurista osaamista.'",
+        givenWords: ["Studerandeutbyte", "berikar", "den", "kulturella", "kompetensen"],
+        correctSentence: "Studerandeutbyte berikar den kulturella kompetensen",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Valinnaiset opinnot antavat mahdollisuuden erikoistua omaan kiinnostukseen.'",
+        givenWords: ["Valfria", "studier", "ger", "möjligheten", "att", "specialisera", "sig", "inom", "eget", "intresse"],
+        correctSentence: "Valfria studier ger möjligheten att specialisera sig inom eget intresse",
+        direction: "fi2sv"
+      },
+
+      // TYÖ- JA SANASTOTEEMAISET KYSYMYKSET (21-40)
+      // Monivalinta (MC) – 10 kpl
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'asiantuntija'?",
+        options: ["expert", "konsult", "ingenjör", "planerare"],
+        correctAnswer: "expert",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'asiantuntijatehtävät'?",
+        options: ["expertuppdrag", "projektuppgifter", "arbetsuppgifter", "utvecklingsuppdrag"],
+        correctAnswer: "expertuppdrag",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'suunnittelu'?",
+        options: ["planering", "utveckling", "produktion", "design"],
+        correctAnswer: "planering",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'kehittäminen'?",
+        options: ["utveckling", "planering", "förbättring", "innovation"],
+        correctAnswer: "utveckling",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'tekniset palvelut'?",
+        options: ["tekniska tjänster", "industriella tjänster", "service", "konsulttjänster"],
+        correctAnswer: "tekniska tjänster",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'järjestelmä'?",
+        options: ["system", "struktur", "ramverk", "modell"],
+        correctAnswer: "system",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'laite'?",
+        options: ["apparat", "maskin", "utrustning", "verktyg"],
+        correctAnswer: "apparat",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'kiinteistö'?",
+        options: ["fastighet", "byggnad", "lokal", "anläggning"],
+        correctAnswer: "fastighet",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'tila'?",
+        options: ["lokal", "rum", "område", "yta"],
+        correctAnswer: "lokal",
+        direction: "fi2sv"
+      },
+      {
+        type: "mc",
+        question: "Mikä on ruotsin termi 'LVI-suunnittelija'?",
+        options: ["VVS-planerare", "VVS-montör", "VVS-tekniker", "VVS-inspektör"],
+        correctAnswer: "VVS-planerare",
+        direction: "fi2sv"
+      },
+      // Lauseen muodostustehtävät – työaiheiset (10 kpl)
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Työnjohtoharjoittelijana opin työelämän käytännöt ja johtamistaitoja.'",
+        givenWords: ["Som", "arbetsledningspraktikant", "lär", "mig", "arbetslivets", "praxis", "och", "ledarskapsförmåga"],
+        correctSentence: "Som arbetsledningspraktikant lär jag mig arbetslivets praxis och ledarskapsförmåga",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Husteknikbranschen erbjuder mångsidiga arbetsuppgifter inom planering och produktion.'",
+        givenWords: ["Husteknikbranschen", "erbjuder", "mångsidiga", "arbetsuppgifter", "inom", "planering", "och", "produktion"],
+        correctSentence: "Husteknikbranschen erbjuder mångsidiga arbetsuppgifter inom planering och produktion",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'LVI-insinöörit vastaavat järjestelmien ylläpidosta ja toimivuudesta.'",
+        givenWords: ["VVS-ingenjörer", "ansvarar", "för", "systemens", "underhåll", "och", "funktion"],
+        correctSentence: "VVS-ingenjörer ansvarar för systemens underhåll och funktion",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Projektipäällikkö johtaa LVI-projekteja aikataulujen ja budjettien mukaisesti.'",
+        givenWords: ["Projektledaren", "leder", "VVS-projekt", "enligt", "tidsplaner", "och", "budgetar"],
+        correctSentence: "Projektledaren leder VVS-projekt enligt tidsplaner och budgetar",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Myynti-insinööri tarjoaa teknistä tukea ja ratkaisuja asiakkaille.'",
+        givenWords: ["Försäljningsingenjören", "erbjuder", "teknisk", "support", "och", "lösningar", "till", "kunder"],
+        correctSentence: "Försäljningsingenjören erbjuder teknisk support och lösningar till kunder",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Konsultti neuvoo asiakkaita LVI-järjestelmien suunnittelussa ja toteutuksessa.'",
+        givenWords: ["Konsulten", "ger", "råd", "till", "kunder", "vid", "planering", "och", "genomförande", "av", "VVS-system"],
+        correctSentence: "Konsulten ger råd till kunder vid planering och genomförande av VVS-system",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Insinöörit työskentelevät sekä yksityisellä että julkisella sektorilla.'",
+        givenWords: ["Ingenjörerna", "arbetar", "både", "i", "den", "privata", "och", "den", "offentliga", "sektorn"],
+        correctSentence: "Ingenjörerna arbetar både i den privata och den offentliga sektorn",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Tuoteteollisuudessa valmistetaan moderneja ratkaisuja erilaisiin tarpeisiin.'",
+        givenWords: ["I", "produktindustrin", "tillverkas", "moderna", "lösningar", "för", "olika", "behov"],
+        correctSentence: "I produktindustrin tillverkas moderna lösningar för olika behov",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Julkinen sektori tarjoaa vakaat työllistymismahdollisuudet.'",
+        givenWords: ["Den", "offentliga", "sektorn", "erbjuder", "stabila", "anställningsmöjligheter"],
+        correctSentence: "Den offentliga sektorn erbjuder stabila anställningsmöjligheter",
+        direction: "fi2sv"
+      },
+      {
+        type: "sentence",
+        question: "Muodosta ruotsiksi: 'Fastighets- ja fastighetsservicebolag ovat merkittäviä työnantajia.'",
+        givenWords: ["Fastighets-", "och", "fastighetsservicebolag", "är", "viktiga", "arbetsgivare"],
+        correctSentence: "Fastighets- och fastighetsservicebolag är viktiga arbetsgivare",
+        direction: "fi2sv"
+      }
     ];
 
     let currentQuestionIndex = 0;
     let currentShuffledOptions = [];
     let currentCorrectIndex = null;
+    let currentFormedSentence = [];
 
     const questionText = document.getElementById("questionText");
     const taskArea = document.getElementById("taskArea");
@@ -171,9 +409,6 @@
     const submitSentence = document.getElementById("submitSentence");
     const clearSentence = document.getElementById("clearSentence");
     const directionInfo = document.getElementById("directionInfo");
-
-    // Alustetaan lauseen muodostuksen muuttujat
-    let currentFormedSentence = [];
 
     function loadQuestion() {
       feedback.textContent = "";
@@ -193,8 +428,7 @@
       questionText.textContent = currentQuestion.question;
 
       if (currentQuestion.type === "mc") {
-        // Monivalintatehtävä
-        // Kopioidaan vaihtoehdot ja sekoitetaan
+        // Monivalintatehtävä: sekoitetaan vaihtoehdot
         currentShuffledOptions = shuffle([...currentQuestion.options]);
         currentCorrectIndex = currentShuffledOptions.findIndex(opt => opt === currentQuestion.correctAnswer);
 
@@ -205,11 +439,9 @@
           taskArea.appendChild(button);
         });
       } else if (currentQuestion.type === "sentence") {
-        // Lauseen muodostustehtävä
-        // Näytetään annetut sanat sekoitetussa järjestyksessä painikkeina
+        // Lauseen muodostustehtävä: näytetään annetut sanat sekoitetussa järjestyksessä
         currentFormedSentence = [];
         const shuffledWords = shuffle([...currentQuestion.givenWords]);
-
         const wordButtonsContainer = document.createElement("div");
         wordButtonsContainer.id = "wordButtonsContainer";
         shuffledWords.forEach((word) => {
@@ -221,13 +453,12 @@
         });
         taskArea.appendChild(wordButtonsContainer);
 
-        // Näytetään alue, johon muodostettu lause ilmestyy
+        // Näytä alue, johon muodostettu lause ilmestyy
         const sentenceArea = document.createElement("div");
         sentenceArea.id = "sentenceArea";
         sentenceArea.textContent = "";
         taskArea.appendChild(sentenceArea);
 
-        // Näytetään lauseen lähetys- ja tyhjennysnapit
         submitSentence.style.display = "inline-block";
         clearSentence.style.display = "inline-block";
       }
@@ -251,9 +482,8 @@
       nextButton.style.display = "block";
     }
 
-    // Lauseen muodostustehtävä: sanan lisääminen
+    // Lauseen muodostustehtävä: lisätään sana
     function addWordToSentence(word, buttonElement) {
-      // Poistetaan painike, jotta sanaa ei voi lisätä uudelleen
       buttonElement.disabled = true;
       currentFormedSentence.push(word);
       updateSentenceArea();
@@ -268,13 +498,11 @@
     function submitSentenceAnswer() {
       const currentQuestion = quizData[currentQuestionIndex];
       const formed = currentFormedSentence.join(" ").trim();
-      // Vertaillaan täsmälleen: voit lisätä pienoismuunnoksia (esim. pienet ja isot kirjaimet) tarpeen mukaan
       if (formed === currentQuestion.correctSentence) {
         feedback.textContent = "Oikein!";
       } else {
         feedback.textContent = "Väärin! Oikea vastaus: " + currentQuestion.correctSentence;
       }
-      // Estetään lisämuokkaus
       disableWordButtons();
       nextButton.style.display = "block";
       submitSentence.style.display = "none";
@@ -286,11 +514,10 @@
       wordButtons.forEach(btn => btn.disabled = true);
     }
 
-    // Lauseen muodostustehtävä: tyhjennä muodostettu vastaus ja palauta painikkeet
+    // Lauseen muodostustehtävä: tyhjennä vastaus ja aktivoi painikkeet uudelleen
     function clearSentenceAnswer() {
       currentFormedSentence = [];
       updateSentenceArea();
-      // Palauta painikkeet aktivoiduiksi
       const wordButtons = document.querySelectorAll("#wordButtonsContainer button");
       wordButtons.forEach(btn => btn.disabled = false);
       feedback.textContent = "";
