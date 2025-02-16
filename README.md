@@ -1,77 +1,4 @@
 # TalotekniikkaPeli
-<html>
-<head>
-    <title>Talotekniikan sanapeli</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f5f5;
-        }
-        .game-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        button {
-            margin: 10px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <div class="game-container">
-        <h1>Talotekniikan sanapeli - Ruotsi</h1>
-        <p id="question">Mikä on "lämmitys" ruotsiksi?</p>
-        <button onclick="checkAnswer('a')" id="optionA">A) Kyla</button>
-        <button onclick="checkAnswer('b')" id="optionB">B) Värme</button>
-        <button onclick="checkAnswer('c')" id="optionC">C) Luft</button>
-        <p id="feedback"></p>
-    </div>
-
-    <script>
-        const questions = [
-            {
-                question: "Mikä on 'lämmitys' ruotsiksi?",
-                answers: { a: "Kyla", b: "Värme", c: "Luft" },
-                correct: "b"
-            },
-            {
-                question: "Mikä on 'ilmanvaihto' ruotsiksi?",
-                answers: { a: "Ventilation", b: "Vatten", c: "Eld" },
-                correct: "a"
-            },
-            {
-                question: "Mikä on 'vesi' ruotsiksi?",
-                answers: { a: "Luft", b: "Värme", c: "Vatten" },
-                correct: "c"
-            }
-        ];
-
-        let currentQuestion = 0;
-
-        function loadQuestion() {
-            const q = questions[currentQuestion];
-            document.getElementById('question').innerText = q.question;
-            document.getElementById('optionA').innerText = `A) ${q.answers.a}`;
-            document.getElementById('optionB').innerText = `B) ${q.answers.b}`;
-            document.getElementById('optionC').innerText = `C) ${q.answers.c}`;
-            document.getElementById('feedback').innerText = '';
-        }
-
-        function checkAnswer(answer) {
-            if (answer === questions[currentQuestion].correct) {
-                document.getElementById('feedback').innerText = 'Oikein! Hyvä sinä!';
-            } else {
-                document.getElementById('feedback').innerText = 'Väärin! Yritä uudelleen!';
-            }
 <!DOCTYPE html>
 <html>
 <head>
@@ -177,24 +104,6 @@
         }
 
         showQuestion();
-    </script>
-</body>
-</html>
-
-            setTimeout(() => {
-                currentQuestion++;
-                if (currentQuestion < questions.length) {
-                    loadQuestion();
-                } else {
-                    document.getElementById('question').innerText = 'Peli ohi! Hyvin tehty!';
-                    document.getElementById('optionA').style.display = 'none';
-                    document.getElementById('optionB').style.display = 'none';
-                    document.getElementById('optionC').style.display = 'none';
-                }
-            }, 1000);
-        }
-
-        loadQuestion();
     </script>
 </body>
 </html>
