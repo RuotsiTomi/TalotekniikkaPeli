@@ -1,109 +1,163 @@
-# TalotekniikkaPeli
-<!DOCTYPE html>
-<html>
+<Talotekniikka TTMI23KM>
+<html lang="fi">
 <head>
-    <title>Talotekniikka-sanapeli</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f5f5;
-        }
-        .game-container {
-            text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        button {
-            padding: 10px 20px;
-            margin: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kaksikielinen Quiz</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .question {
+      font-size: 1.2em;
+      margin-bottom: 10px;
+    }
+    .options button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background: #fff;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .options button:hover:not(:disabled) {
+      background: #e0e0e0;
+    }
+    .options button.correct {
+      background: #c8e6c9;
+      border-color: #388e3c;
+      color: #388e3c;
+    }
+    .options button.incorrect {
+      background: #ffcdd2;
+      border-color: #d32f2f;
+      color: #d32f2f;
+    }
+    #nextButton {
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      margin-top: 10px;
+      display: none;
+    }
+    #feedback {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>Talotekniikka-sanapeli</h1>
-        <p id="question">Kysymys tulee tähän</p>
-        <button onclick="checkAnswer(true)">Oikein</button>
-        <button onclick="checkAnswer(false)">Väärin</button>
-        <p id="score">Pisteet: 0</p>
+  <div class="container">
+    <div id="quiz">
+      <div class="question" id="questionText">Kysymys tulee tähän...</div>
+      <div class="options" id="optionsContainer">
+        <!-- Vastausvaihtoehdot lisätään tähän JavaScriptillä -->
+      </div>
+      <div id="feedback"></div>
+      <button id="nextButton">Seuraava kysymys</button>
     </div>
+  </div>
 
-    <script>
-        const questions = [
-            { question: "Kunna, kan, kunde, kunnat", correct: true },
-            { question: "Avlägga, avlägger, avlade, avlagt en examen", correct: true },
-            { question: "Husteknik, hustekniken", correct: true },
-            { question: "En benämning, benämningen", correct: false },
-            { question: "En helhet, helheten", correct: true },
-            { question: "Bestå, består, bestod, bestått av ngt", correct: false },
-            { question: "Tekniska tjänster, de tekniska tjänsterna", correct: true },
-            { question: "Ett system, systemet, system, systemen", correct: true },
-            { question: "En apparat, apparaten, apparater, apparaterna", correct: false },
-            { question: "En fastighet, fastigheten, fastigheter, fastigheterna", correct: true },
-            { question: "En lokal, lokalen, lokaler, lokalerna", correct: true },
-            { question: "Höra, hör, hörde, hört till ngt", correct: false },
-            { question: "Delas in i ngt", correct: true },
-            { question: "VVS-husteknik", correct: true },
-            { question: "En elektrisk husteknik", correct: false },
-            { question: "Utöver ngt", correct: true },
-            { question: "Naturvetenskapliga ämnen", correct: true },
-            { question: "En studerande, studeranden", correct: true },
-            { question: "Kompetenser, kompetenserna i ngt", correct: false },
-            { question: "En planering, planeringen", correct: true },
-            { question: "En planerare, planeraren, planerare, planerarna", correct: true },
-            { question: "En produktion, produktionen", correct: true },
-            { question: "En hantering, hanteringen", correct: false },
-            { question: "En utveckling, utvecklingen", correct: true },
-            { question: "Ett värmesystem, -systemet, -system, -systemen", correct: true },
-            { question: "Ett vattenförsörjningssystem", correct: false },
-            { question: "Ett ventilationssystem", correct: true },
-            { question: "Den utexaminerade", correct: true },
-            { question: "Behärska, behärskar, behärskade, behärskat", correct: false },
-            { question: "Tillämpa, tillämpar, tillämpade, tillämpat", correct: true },
-            { question: "Miljövänlig", correct: true },
-            { question: "Energieffektiv", correct: true },
-            { question: "Ett bruk, bruket", correct: false },
-            { question: "Hälsosam", correct: true },
-            { question: "Trivsam", correct: true },
-            { question: "En bo- och arbetsmiljö, -miljön", correct: false },
-            { question: "Förverkliga, förverkligar, förverkligade, förverkligat", correct: true },
-            { question: "Fungerande", correct: true },
-            { question: "Säker, säkert, säkra", correct: true },
-            { question: "En lösning, lösningen, lösningar, lösningarna", correct: false }
-        ];
+  <script>
+    // Kysymysten ja vastausten data
+    const quizData = [
+      {
+        question: "Mikä on ruotsinkielinen vastine sanalle 'etäopetus'?",
+        options: [
+          "studera på distans",
+          "en distansstuderande",
+          "distansstudier",
+          "opiskella etänä"
+        ],
+        correctIndex: 2
+      },
+      {
+        question: "Mikä on oikea käännös lauseelle: 'LVI-suunnittelija suunnittelee lämmitys-, vesi- ja ilmastointijärjestelmiä rakennuksiin.'?",
+        options: [
+          "En VVS-planerare planerar värme-, vatten- och ventilationssystem för byggnader.",
+          "En VVS-montör installerar och underhåller VVS-system.",
+          "En konsult erbjuder expertistjänster inom VVS.",
+          "En underhållsingenjör ansvarar för VVS-systemens funktion."
+        ],
+        correctIndex: 0
+      },
+      // Lisää kysymyksiä halutessasi
+    ];
 
-        let score = 0;
-        let currentQuestionIndex = 0;
+    let currentQuestionIndex = 0;
+    const questionText = document.getElementById("questionText");
+    const optionsContainer = document.getElementById("optionsContainer");
+    const feedback = document.getElementById("feedback");
+    const nextButton = document.getElementById("nextButton");
 
-        function showQuestion() {
-            document.getElementById("question").textContent = questions[currentQuestionIndex].question;
-        }
+    // Lataa kysymys
+    function loadQuestion() {
+      // Nollataan palaute ja piilotetaan seuraava-painike
+      feedback.textContent = "";
+      nextButton.style.display = "none";
+      // Tyhjennetään aiemmat vastausnapit
+      optionsContainer.innerHTML = "";
 
-        function checkAnswer(isCorrect) {
-            if (isCorrect === questions[currentQuestionIndex].correct) {
-                score++;
-            }
-            currentQuestionIndex++;
-            if (currentQuestionIndex < questions.length) {
-                showQuestion();
-            } else {
-                alert("Peli ohi! Lopulliset pisteet: " + score);
-                currentQuestionIndex = 0;
-                score = 0;
-                showQuestion();
-            }
-            document.getElementById("score").textContent = "Pisteet: " + score;
-        }
+      const currentQuestion = quizData[currentQuestionIndex];
+      questionText.textContent = currentQuestion.question;
 
-        showQuestion();
-    </script>
+      currentQuestion.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.textContent = option;
+        button.addEventListener("click", () => selectOption(index, button));
+        optionsContainer.appendChild(button);
+      });
+    }
+
+    // Käsittele vastausnapin klikkaus
+    function selectOption(selectedIndex, buttonElement) {
+      // Estetään lisäklikkaukset
+      const buttons = optionsContainer.querySelectorAll("button");
+      buttons.forEach(btn => btn.disabled = true);
+
+      const currentQuestion = quizData[currentQuestionIndex];
+      if(selectedIndex === currentQuestion.correctIndex) {
+        buttonElement.classList.add("correct");
+        feedback.textContent = "Oikein!";
+      } else {
+        buttonElement.classList.add("incorrect");
+        feedback.textContent = "Väärin!";
+        // Korostetaan oikeaa vastausta
+        buttons[currentQuestion.correctIndex].classList.add("correct");
+      }
+      nextButton.style.display = "block";
+    }
+
+    // Siirry seuraavaan kysymykseen
+    nextButton.addEventListener("click", () => {
+      currentQuestionIndex++;
+      if(currentQuestionIndex < quizData.length) {
+        loadQuestion();
+      } else {
+        questionText.textContent = "Testi suoritettu!";
+        optionsContainer.innerHTML = "";
+        feedback.textContent = "";
+        nextButton.style.display = "none";
+      }
+    });
+
+    // Aloitetaan ensimmäisellä kysymyksellä
+    loadQuestion();
+  </script>
 </body>
 </html>
