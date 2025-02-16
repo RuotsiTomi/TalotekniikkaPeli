@@ -12,7 +12,7 @@
       padding: 20px;
     }
     .container {
-      max-width: 600px;
+      max-width: 800px;
       margin: auto;
       background: #fff;
       padding: 20px;
@@ -74,7 +74,8 @@
   </div>
 
   <script>
-    // Kysymysten ja vastausten data
+    // Kysymysten ja vastausten data. Voit lisätä tähän niin monta kysymystä kuin haluat.
+    // Voit käyttää myös vain kaksi vaihtoehtoa "oikein/väärin" kysymyksille.
     const quizData = [
       {
         question: "Mikä on ruotsinkielinen vastine sanalle 'etäopetus'?",
@@ -87,6 +88,14 @@
         correctIndex: 2
       },
       {
+        question: "Onko seuraava väittämä totta? 'En distansstuderande opiskelee etänä.'",
+        options: [
+          "Oikein",
+          "Väärin"
+        ],
+        correctIndex: 0
+      },
+      {
         question: "Mikä on oikea käännös lauseelle: 'LVI-suunnittelija suunnittelee lämmitys-, vesi- ja ilmastointijärjestelmiä rakennuksiin.'?",
         options: [
           "En VVS-planerare planerar värme-, vatten- och ventilationssystem för byggnader.",
@@ -96,7 +105,26 @@
         ],
         correctIndex: 0
       },
-      // Lisää kysymyksiä halutessasi
+      {
+        question: "Onko seuraava väittämä totta? 'En VVS-montör installerar ja huoltaa VVS-system.'",
+        options: [
+          "Oikein",
+          "Väärin"
+        ],
+        correctIndex: 0
+      },
+      // Lisää kysymyksiä tähän...
+      // Esimerkiksi:
+      {
+        question: "Mikä on ruotsinkielinen termi 'opiskella etänä'?",
+        options: [
+          "studera på distans",
+          "distansstudier",
+          "en distansstuderande",
+          "opiskella etänä"
+        ],
+        correctIndex: 0
+      }
     ];
 
     let currentQuestionIndex = 0;
@@ -137,8 +165,10 @@
       } else {
         buttonElement.classList.add("incorrect");
         feedback.textContent = "Väärin!";
-        // Korostetaan oikeaa vastausta
-        buttons[currentQuestion.correctIndex].classList.add("correct");
+        // Korostetaan oikeaa vastausta, jos mahdollista
+        if(buttons[currentQuestion.correctIndex]) {
+          buttons[currentQuestion.correctIndex].classList.add("correct");
+        }
       }
       nextButton.style.display = "block";
     }
